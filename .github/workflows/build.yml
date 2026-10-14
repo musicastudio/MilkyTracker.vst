@@ -31,8 +31,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+      # The unpackers' sources. Not RtAudio: milkyplay's Windows driver would build it, and the plug-in plays through
+      # the host (the standalone through clap-wrapper's own RtAudio).
+      - name: Submodules
+        run: git submodule update --init src/submodules/zlib src/submodules/zziplib src/submodules/lhasa
       # The editor is an X11 window, checked under Xvfb; the standalone's audio and MIDI are RtAudio's ALSA, JACK and
       # PulseAudio backends and RtMidi's ALSA one, each built only when its headers are there.
       - name: Linux dependencies
