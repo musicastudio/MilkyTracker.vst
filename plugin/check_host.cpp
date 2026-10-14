@@ -1272,7 +1272,15 @@ static void editorChecks(const std::string& format, Plug& p, Audio& a, Feed& f) 
         win.resize(bw, bh);
         pump(p, &win, 800);
         px = win.capture();
-        drawn(px, lit, colours);
+        int vw = bw, vh = bh;   // what the screen shows of it
+#ifdef _WIN32   // Windows keeps a window within the desktop: on a CI runner's 1024 x 768 the 150% editor shows a corner
+        RECT cr;
+        GetClientRect(win.hwnd, &cr);
+        vw = std::min(vw, (int)cr.right), vh = std::min(vh, (int)cr.bottom);
+#endif
+        std::vector<uint32_t> shown;
+        for (int y = 0; y < vh; ++y) shown.insert(shown.end(), px.begin() + (size_t)y * bw, px.begin() + (size_t)y * bw + vw);
+        drawn(shown, lit, colours);
         CHECK(lit > 0.15, "at 150%% the window is not drawn");
         writePng(format + "_editor_150", px, bw, bh);
         win.click(at(1052 + 96 + 22, bw, kW), at(8 + 612 + 11, bh, kH));   // 100%
