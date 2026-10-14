@@ -1,0 +1,1286 @@
+{
+ "size": [
+  255,
+  732
+ ],
+ "widgets": [
+  {
+   "type": "plate",
+   "name": "carton",
+   "rect": [
+    16,
+    11,
+    28,
+    28
+   ],
+   "fill": {
+    "image": "branding/carton"
+   }
+  },
+  {
+   "type": "plate",
+   "name": "title",
+   "rect": [
+    50,
+    8,
+    190,
+    34
+   ],
+   "text": {
+    "text": "MilkyTracker.vst",
+    "font": "aw_light_24",
+    "align": "left",
+    "valign": "middle"
+   }
+  },
+  {
+   "type": "plate",
+   "name": "mode_frame",
+   "rect": [
+    10,
+    68,
+    235,
+    80
+   ],
+   "layer": 0,
+   "fill": {
+    "image": "panels/group_box_dark_tab"
+   }
+  },
+  {
+   "type": "plate",
+   "name": "mode_title",
+   "rect": [
+    10,
+    45,
+    90,
+    23
+   ],
+   "layer": 0,
+   "text": {
+    "text": "Mode",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "pad": [
+    22,
+    4,
+    22,
+    0
+   ],
+   "fill": {
+    "image": "panels/group_tab_dark"
+   }
+  },
+  {
+   "type": "button",
+   "name": "mode_free",
+   "rect": [
+    20,
+    76,
+    215,
+    22
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "Free",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "pad": [
+    10,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "action": {
+    "value": 0
+   },
+   "param": "mode",
+   "tip": "The tracker plays on its own, at its own BPM"
+  },
+  {
+   "type": "button",
+   "name": "mode_sync",
+   "rect": [
+    20,
+    100,
+    215,
+    22
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "DAW Sync",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "pad": [
+    10,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "action": {
+    "value": 1
+   },
+   "param": "mode",
+   "tip": "The tracker follows the host's tempo, times the Ratio, and its transport"
+  },
+  {
+   "type": "button",
+   "name": "mode_trigger",
+   "rect": [
+    20,
+    124,
+    215,
+    22
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "MIDI Trigger",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "pad": [
+    10,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "action": {
+    "value": 2
+   },
+   "param": "mode",
+   "tip": "Pattern keys play their patterns, pitch keys move them up or down"
+  },
+  {
+   "type": "plate",
+   "name": "sync_frame",
+   "rect": [
+    10,
+    176,
+    235,
+    90
+   ],
+   "layer": 0,
+   "fill": {
+    "image": "panels/group_box_dark_tab"
+   }
+  },
+  {
+   "type": "plate",
+   "name": "sync_title",
+   "rect": [
+    10,
+    153,
+    112,
+    23
+   ],
+   "layer": 0,
+   "text": {
+    "text": "DAW Sync",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "pad": [
+    22,
+    4,
+    22,
+    0
+   ],
+   "fill": {
+    "image": "panels/group_tab_dark"
+   }
+  },
+  {
+   "type": "plate",
+   "name": "ratio_label",
+   "rect": [
+    20,
+    186,
+    82,
+    20
+   ],
+   "text": {
+    "text": "Ratio",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "enableIf": {
+    "param": "mode",
+    "notEquals": 0
+   }
+  },
+  {
+   "type": "number",
+   "name": "ratio",
+   "rect": [
+    105,
+    186,
+    130,
+    20
+   ],
+   "param": "sync.ratio",
+   "fill": {
+    "image": "panels/label_plate_inv"
+   },
+   "text": {
+    "text": "",
+    "font": "mt_value",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    2,
+    2,
+    2
+   ],
+   "fine": 0.2,
+   "reset": "default",
+   "editable": true,
+   "enableIf": {
+    "param": "mode",
+    "notEquals": 0
+   },
+   "tip": "The tracker's BPM is the host's times this. At x1 a beat is four rows at speed 6, as in Fasttracker II"
+  },
+  {
+   "type": "plate",
+   "name": "status_screen",
+   "rect": [
+    16,
+    212,
+    223,
+    48
+   ],
+   "fill": {
+    "image": "displays/op_screen"
+   },
+   "surface": false,
+   "layer": 2,
+   "enableIf": {
+    "param": "mode",
+    "notEquals": 0
+   }
+  },
+  {
+   "type": "textbox",
+   "name": "status",
+   "rect": [
+    26,
+    214,
+    205,
+    44
+   ],
+   "key": "live.sync",
+   "multiline": true,
+   "layer": 3,
+   "text": {
+    "text": "No tempo from the host",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "enableIf": {
+    "param": "mode",
+    "notEquals": 0
+   }
+  },
+  {
+   "type": "plate",
+   "name": "trigger_frame",
+   "rect": [
+    10,
+    294,
+    235,
+    262
+   ],
+   "layer": 0,
+   "fill": {
+    "image": "panels/group_box_dark_tab"
+   }
+  },
+  {
+   "type": "plate",
+   "name": "trigger_title",
+   "rect": [
+    10,
+    271,
+    142,
+    23
+   ],
+   "layer": 0,
+   "text": {
+    "text": "MIDI Trigger",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "pad": [
+    22,
+    4,
+    22,
+    0
+   ],
+   "fill": {
+    "image": "panels/group_tab_dark"
+   }
+  },
+  {
+   "type": "plate",
+   "name": "trigger_hint",
+   "rect": [
+    20,
+    300,
+    219,
+    40
+   ],
+   "text": {
+    "text": "Drag the zones under the\\nkeys. Right-click a blue\\nkey to choose patterns.",
+    "font": "mt_dim",
+    "align": "left",
+    "valign": "middle"
+   },
+   "multiline": true,
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   }
+  },
+  {
+   "type": "plate",
+   "name": "pitch_swatch",
+   "rect": [
+    20,
+    349,
+    12,
+    12
+   ],
+   "fill": {
+    "colour": "#39ff7aff"
+   },
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   }
+  },
+  {
+   "type": "plate",
+   "name": "pitch_label",
+   "rect": [
+    38,
+    344,
+    64,
+    20
+   ],
+   "text": {
+    "text": "Pitch",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   }
+  },
+  {
+   "type": "number",
+   "name": "pitch_from",
+   "rect": [
+    105,
+    344,
+    63,
+    20
+   ],
+   "param": "trigger.pitch_from",
+   "fill": {
+    "image": "panels/label_plate_inv"
+   },
+   "text": {
+    "text": "",
+    "font": "mt_value",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    2,
+    2,
+    2
+   ],
+   "fine": 0.2,
+   "reset": "default",
+   "editable": true,
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   },
+   "tip": "The first green key"
+  },
+  {
+   "type": "number",
+   "name": "pitch_count",
+   "rect": [
+    172,
+    344,
+    63,
+    20
+   ],
+   "param": "trigger.pitch_count",
+   "fill": {
+    "image": "panels/label_plate_inv"
+   },
+   "text": {
+    "text": "",
+    "font": "mt_value",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    2,
+    2,
+    2
+   ],
+   "fine": 0.2,
+   "reset": "default",
+   "editable": true,
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   },
+   "tip": "How many green keys"
+  },
+  {
+   "type": "plate",
+   "name": "pattern_swatch",
+   "rect": [
+    20,
+    375,
+    12,
+    12
+   ],
+   "fill": {
+    "colour": "#3a9dffff"
+   },
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   }
+  },
+  {
+   "type": "plate",
+   "name": "pattern_label",
+   "rect": [
+    38,
+    370,
+    64,
+    20
+   ],
+   "text": {
+    "text": "Patterns",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   }
+  },
+  {
+   "type": "number",
+   "name": "patterns_from",
+   "rect": [
+    105,
+    370,
+    63,
+    20
+   ],
+   "param": "trigger.patterns_from",
+   "fill": {
+    "image": "panels/label_plate_inv"
+   },
+   "text": {
+    "text": "",
+    "font": "mt_value",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    2,
+    2,
+    2
+   ],
+   "fine": 0.2,
+   "reset": "default",
+   "editable": true,
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   },
+   "tip": "The first blue key"
+  },
+  {
+   "type": "number",
+   "name": "patterns_count",
+   "rect": [
+    172,
+    370,
+    63,
+    20
+   ],
+   "param": "trigger.patterns_count",
+   "fill": {
+    "image": "panels/label_plate_inv"
+   },
+   "text": {
+    "text": "",
+    "font": "mt_value",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    2,
+    2,
+    2
+   ],
+   "fine": 0.2,
+   "reset": "default",
+   "editable": true,
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   },
+   "tip": "How many blue keys"
+  },
+  {
+   "type": "plate",
+   "name": "home_label",
+   "rect": [
+    20,
+    396,
+    82,
+    20
+   ],
+   "text": {
+    "text": "Home",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   }
+  },
+  {
+   "type": "number",
+   "name": "home",
+   "rect": [
+    105,
+    396,
+    130,
+    20
+   ],
+   "param": "trigger.home",
+   "fill": {
+    "image": "panels/label_plate_inv"
+   },
+   "text": {
+    "text": "",
+    "font": "mt_value",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    2,
+    2,
+    2
+   ],
+   "fine": 0.2,
+   "reset": "default",
+   "editable": true,
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   },
+   "tip": "The green key that plays the patterns as written; the others move them up or down"
+  },
+  {
+   "type": "plate",
+   "name": "play_label",
+   "rect": [
+    20,
+    422,
+    82,
+    20
+   ],
+   "text": {
+    "text": "Play",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   }
+  },
+  {
+   "type": "button",
+   "name": "play_gate",
+   "rect": [
+    105,
+    421,
+    63,
+    22
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "Gate",
+    "font": "mt_text",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "action": {
+    "value": 0
+   },
+   "param": "trigger.latch",
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   },
+   "tip": "A key's patterns play while it is held"
+  },
+  {
+   "type": "button",
+   "name": "play_latch",
+   "rect": [
+    172,
+    421,
+    63,
+    22
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "Latch",
+    "font": "mt_text",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "action": {
+    "value": 1
+   },
+   "param": "trigger.latch",
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   },
+   "tip": "A press starts a key's patterns, the next press stops them"
+  },
+  {
+   "type": "button",
+   "name": "loop",
+   "rect": [
+    20,
+    446,
+    215,
+    22
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "Loop",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "pad": [
+    10,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "toggle": true,
+   "param": "trigger.loop",
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   },
+   "tip": "A key's patterns start over after the last one"
+  },
+  {
+   "type": "plate",
+   "name": "edit_key_label",
+   "rect": [
+    20,
+    472,
+    82,
+    20
+   ],
+   "text": {
+    "text": "Key",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   }
+  },
+  {
+   "type": "number",
+   "name": "edit_key",
+   "rect": [
+    105,
+    472,
+    130,
+    20
+   ],
+   "param": "trigger.key",
+   "fill": {
+    "image": "panels/label_plate_inv"
+   },
+   "text": {
+    "text": "",
+    "font": "mt_value",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    2,
+    2,
+    2
+   ],
+   "fine": 0.2,
+   "reset": "default",
+   "editable": true,
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   },
+   "tip": "The blue key whose patterns are shown. Pressing a blue key picks it too"
+  },
+  {
+   "type": "plate",
+   "name": "patterns_list_label",
+   "rect": [
+    20,
+    498,
+    82,
+    20
+   ],
+   "text": {
+    "text": "Plays",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   }
+  },
+  {
+   "type": "button",
+   "name": "patterns_open",
+   "rect": [
+    105,
+    497,
+    130,
+    22
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "{data:live.trigger.edit|none}",
+    "font": "mt_value",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "action": {
+    "modal": "dialog_patterns"
+   },
+   "press": "up",
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   },
+   "tip": "The key's patterns, in order: choose them"
+  },
+  {
+   "type": "plate",
+   "name": "transpose_label",
+   "rect": [
+    20,
+    524,
+    82,
+    20
+   ],
+   "text": {
+    "text": "Transpose",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   }
+  },
+  {
+   "type": "number",
+   "name": "transpose",
+   "rect": [
+    105,
+    524,
+    130,
+    20
+   ],
+   "param": "trigger.transpose",
+   "fill": {
+    "image": "panels/label_plate_inv"
+   },
+   "text": {
+    "text": "",
+    "font": "mt_value",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    2,
+    2,
+    2
+   ],
+   "fine": 0.2,
+   "reset": "default",
+   "editable": true,
+   "enableIf": {
+    "param": "mode",
+    "equals": 2
+   },
+   "tip": "Semitones the patterns play at: the last green key pressed, less Home"
+  },
+  {
+   "type": "plate",
+   "name": "output_frame",
+   "rect": [
+    10,
+    586,
+    235,
+    140
+   ],
+   "layer": 0,
+   "fill": {
+    "image": "panels/group_box_dark_tab"
+   }
+  },
+  {
+   "type": "plate",
+   "name": "output_title",
+   "rect": [
+    10,
+    563,
+    96,
+    23
+   ],
+   "layer": 0,
+   "text": {
+    "text": "Output",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   },
+   "pad": [
+    22,
+    4,
+    22,
+    0
+   ],
+   "fill": {
+    "image": "panels/group_tab_dark"
+   }
+  },
+  {
+   "type": "plate",
+   "name": "volume_label",
+   "rect": [
+    16,
+    594,
+    64,
+    16
+   ],
+   "text": {
+    "text": "Volume",
+    "font": "mt_text",
+    "align": "center",
+    "valign": "middle"
+   }
+  },
+  {
+   "type": "dial",
+   "name": "volume",
+   "rect": [
+    20,
+    612,
+    56,
+    56
+   ],
+   "image": "knobs/rotary_large",
+   "param": "master.volume",
+   "fine": 0.2,
+   "wheel": 0.05
+  },
+  {
+   "type": "number",
+   "name": "volume_value",
+   "rect": [
+    12,
+    670,
+    72,
+    16
+   ],
+   "param": "master.volume",
+   "text": {
+    "text": "",
+    "font": "mt_value",
+    "align": "center",
+    "valign": "middle"
+   },
+   "format": "%.1f dB",
+   "reset": "default",
+   "editable": true
+  },
+  {
+   "type": "plate",
+   "name": "size_label",
+   "rect": [
+    96,
+    594,
+    140,
+    16
+   ],
+   "text": {
+    "text": "Window size",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   }
+  },
+  {
+   "type": "button",
+   "name": "scale_100",
+   "rect": [
+    96,
+    612,
+    44,
+    22
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "100%",
+    "font": "mt_text",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "action": {
+    "scale": 1
+   },
+   "press": "up"
+  },
+  {
+   "type": "button",
+   "name": "scale_150",
+   "rect": [
+    144,
+    612,
+    44,
+    22
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "150%",
+    "font": "mt_text",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "action": {
+    "scale": 1.5
+   },
+   "press": "up"
+  },
+  {
+   "type": "button",
+   "name": "scale_200",
+   "rect": [
+    192,
+    612,
+    44,
+    22
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "200%",
+    "font": "mt_text",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "action": {
+    "scale": 2
+   },
+   "press": "up"
+  },
+  {
+   "type": "plate",
+   "name": "tracker_size_label",
+   "rect": [
+    96,
+    640,
+    140,
+    16
+   ],
+   "text": {
+    "text": "Tracker",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   }
+  },
+  {
+   "type": "button",
+   "name": "tracker_1x",
+   "rect": [
+    96,
+    658,
+    44,
+    22
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "1x",
+    "font": "mt_text",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "param": "gui.tracker_scale",
+   "action": {
+    "value": 1
+   },
+   "tip": "MilkyTracker at its own size, all of it in sight (its Config page's Scale x1)"
+  },
+  {
+   "type": "button",
+   "name": "tracker_2x",
+   "rect": [
+    144,
+    658,
+    44,
+    22
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "2x",
+    "font": "mt_text",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "param": "gui.tracker_scale",
+   "action": {
+    "value": 2
+   },
+   "tip": "MilkyTracker at twice its size, a quarter in sight: the bars beside it pan (its Config page's Scale x2)"
+  },
+  {
+   "type": "plate",
+   "name": "musica",
+   "rect": [
+    137,
+    690,
+    54,
+    22
+   ],
+   "text": {
+    "text": "musica.",
+    "font": "aw_light_16",
+    "align": "left",
+    "valign": "middle"
+   }
+  },
+  {
+   "type": "plate",
+   "name": "studio",
+   "rect": [
+    191,
+    690,
+    48,
+    22
+   ],
+   "text": {
+    "text": "studio",
+    "font": "aw_pale_16",
+    "align": "left",
+    "valign": "middle"
+   }
+  },
+  {
+   "type": "button",
+   "name": "musica_studio",
+   "rect": [
+    137,
+    690,
+    100,
+    22
+   ],
+   "layer": 4,
+   "press": "up",
+   "action": {
+    "url": "https://github.com/musicastudio/MilkyTracker.vst"
+   }
+  }
+ ]
+}

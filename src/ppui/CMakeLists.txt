@@ -169,6 +169,8 @@ elseif(HAIKU)
             osinterface/posix
     )
     target_compile_options(ppui PRIVATE -iquote ${PROJECT_SOURCE_DIR}/src/ppui)
+elseif(MILKYTRACKER_PLUGIN)
+    target_include_directories(ppui PUBLIC osinterface/posix)   # the Linux plug-in draws into memory (plugin/tracker_host.cpp)
 else()
     target_sources(ppui
         PRIVATE

@@ -75,7 +75,7 @@ struct Limiter : public Mixable
   void init(mp_uint32 s_rate, mp_uint32 buffersize){
     cleanup();
     fs = s_rate;
-    buffer_len = buffersize; 
+    buffer_len = buffersize ? buffersize : 1;   // a mixer may start with no block size yet (the NULL driver's)
     buffer_len_orig = buffersize;
     buffer_pos = 0;
     /* Find size for power-of-two interleaved delay buffer */

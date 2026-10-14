@@ -125,7 +125,11 @@ const SYSCHAR* System::getConfigFileName()
 	mkdir(buffer, S_IRWXU);
 	strncat(buffer, "/milkytracker", PATH_MAX);
 	mkdir(buffer, S_IRWXU);
+#ifdef MILKYTRACKER_PLUGIN
+	strncat(buffer, "/plugin_config", PATH_MAX);   // its own: the standalone's window and driver settings are not a plug-in's
+#else
 	strncat(buffer, "/config", PATH_MAX);
+#endif
 	// Move possible existing config into new location if not already present
 	if(home && access(oldLoc, F_OK) == 0 && access(buffer, F_OK) != 0)
 		rename(oldLoc, buffer);

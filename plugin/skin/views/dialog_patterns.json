@@ -1,0 +1,401 @@
+{
+ "size": [
+  460,
+  360
+ ],
+ "fill": {
+  "image": "backgrounds/dialog"
+ },
+ "widgets": [
+  {
+   "type": "plate",
+   "name": "title",
+   "rect": [
+    20,
+    12,
+    420,
+    28
+   ],
+   "text": {
+    "text": "Patterns for key {data:live.trigger.keyname|C3}",
+    "font": "mt_title",
+    "align": "left",
+    "valign": "middle"
+   }
+  },
+  {
+   "type": "plate",
+   "name": "song_label",
+   "rect": [
+    20,
+    48,
+    180,
+    18
+   ],
+   "text": {
+    "text": "In the song",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   }
+  },
+  {
+   "type": "list",
+   "name": "song",
+   "rect": [
+    20,
+    68,
+    180,
+    232
+   ],
+   "columns": [
+    {
+     "width": 32
+    },
+    {
+     "width": 120
+    }
+   ],
+   "colGap": 8,
+   "dataRows": {
+    "key": "live.patterns.song",
+    "row": [
+     "{1}",
+     "{2}"
+    ],
+    "param": "gui.pick_song"
+   },
+   "tip": "Pick a pattern, then Add",
+   "fill": {
+    "image": "panels/inset_light_inv"
+   },
+   "rowHeight": 18,
+   "pad": [
+    6,
+    6,
+    6,
+    6
+   ],
+   "row": {
+    "font": "mt_text",
+    "valign": "middle"
+   },
+   "selectRow": {
+    "font": "mt_value",
+    "valign": "middle"
+   },
+   "selectFill": "#6a4fa0d0",
+   "scroll": {
+    "track": "scrollbars/list_track",
+    "thumb": "scrollbars/library_thumb_flat",
+    "width": 12
+   },
+   "param": "gui.pick_song"
+  },
+  {
+   "type": "button",
+   "name": "add",
+   "rect": [
+    210,
+    140,
+    70,
+    24
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "Add >",
+    "font": "mt_text",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "action": {
+    "data": {
+     "live.patterns.cmd": "add"
+    }
+   },
+   "press": "up",
+   "tip": "Adds the picked pattern to the end of the key's list"
+  },
+  {
+   "type": "button",
+   "name": "remove",
+   "rect": [
+    210,
+    172,
+    70,
+    24
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "< Remove",
+    "font": "mt_text",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "action": {
+    "data": {
+     "live.patterns.cmd": "remove"
+    }
+   },
+   "press": "up",
+   "tip": "Takes the picked place off the key's list"
+  },
+  {
+   "type": "plate",
+   "name": "key_label",
+   "rect": [
+    290,
+    48,
+    150,
+    18
+   ],
+   "text": {
+    "text": "This key plays",
+    "font": "mt_text",
+    "align": "left",
+    "valign": "middle"
+   }
+  },
+  {
+   "type": "list",
+   "name": "key",
+   "rect": [
+    290,
+    68,
+    150,
+    196
+   ],
+   "columns": [
+    {
+     "width": 24,
+     "align": "right"
+    },
+    {
+     "width": 90
+    }
+   ],
+   "colGap": 12,
+   "dataRows": {
+    "key": "live.patterns.key",
+    "row": [
+     "{1}",
+     "{2}"
+    ],
+    "param": "gui.pick_key"
+   },
+   "fill": {
+    "image": "panels/inset_light_inv"
+   },
+   "rowHeight": 18,
+   "pad": [
+    6,
+    6,
+    6,
+    6
+   ],
+   "row": {
+    "font": "mt_text",
+    "valign": "middle"
+   },
+   "selectRow": {
+    "font": "mt_value",
+    "valign": "middle"
+   },
+   "selectFill": "#6a4fa0d0",
+   "scroll": {
+    "track": "scrollbars/list_track",
+    "thumb": "scrollbars/library_thumb_flat",
+    "width": 12
+   },
+   "param": "gui.pick_key"
+  },
+  {
+   "type": "button",
+   "name": "up",
+   "rect": [
+    290,
+    270,
+    46,
+    24
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "Up",
+    "font": "mt_text",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "action": {
+    "data": {
+     "live.patterns.cmd": "up"
+    }
+   },
+   "press": "up",
+   "tip": "Plays the picked pattern sooner"
+  },
+  {
+   "type": "button",
+   "name": "down",
+   "rect": [
+    342,
+    270,
+    46,
+    24
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "Down",
+    "font": "mt_text",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "action": {
+    "data": {
+     "live.patterns.cmd": "down"
+    }
+   },
+   "press": "up",
+   "tip": "Plays the picked pattern later"
+  },
+  {
+   "type": "button",
+   "name": "clear",
+   "rect": [
+    394,
+    270,
+    46,
+    24
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "Clear",
+    "font": "mt_text",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "action": {
+    "data": {
+     "live.patterns.cmd": "clear"
+    }
+   },
+   "press": "up",
+   "tip": "Empties the key's list"
+  },
+  {
+   "type": "plate",
+   "name": "hint",
+   "rect": [
+    20,
+    310,
+    320,
+    36
+   ],
+   "text": {
+    "text": "A key plays its patterns in turn,\\nas often as it lists each one.",
+    "font": "mt_dim",
+    "align": "left",
+    "valign": "middle"
+   },
+   "multiline": true
+  },
+  {
+   "type": "button",
+   "name": "done",
+   "rect": [
+    360,
+    314,
+    80,
+    28
+   ],
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "Done",
+    "font": "mt_text",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
+   "action": {
+    "modal": ""
+   },
+   "press": "up"
+  }
+ ]
+}

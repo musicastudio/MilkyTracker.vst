@@ -1,0 +1,270 @@
+// Hollow: a small plug-in framework whose GUI is a data-driven skin (docs/skin-format.md).
+// This header is the whole public API. A product implements pluginInfo() and, if it makes
+// sound, createProcessor(); the format layers (CLAP, VST2, DXi, and VST3/AU/standalone through
+// clap-wrapper) and the editor do the rest.
+#pragma once
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
+namespace hollow {
+
+// ---- product description ------------------------------------------------------------------
+
+struct Info {
+    const char* id;            // reverse-DNS, e.g. "com.example.my-synth"
+    const char* name;          // "My Synth"
+    const char* vendor;
+    const char* url;
+    const char* version;       // "1.0.0"
+    const char* description;
+    bool instrument = true;    // false = audio effect
+    int inputs = 0;            // audio input channels (0 or 2)
+    int outputs = 2;           // audio output channels
+    bool midiIn = true;
+    bool midiOut = false;
+};
+
+// ---- parameters (the skin's params.json) ---------------------------------------------------
+
+struct ParamDef {
+    std::string id, name, unit, format;
+    double min = 0, max = 1, def = 0;
+    int steps = 0;                        // 0 = continuous, n = n + 1 values
+    bool log = false;                     // params.json "taper": "log"
+    bool host = true;                     // params.json "host": false keeps it off the host's list (still saved)
+    std::vector<std::string> labels;
+    uint32_t hostId = 0;                  // fnv1a32(id) & 0x7fffffff
+};
+
+class Skin;                               // a loaded skin; opaque outside the core
+
+// ---- widgets the product draws (optional) -----------------------------------------------------------
+
+// Input to a Pixels view. Pointer positions are in the view's own pixels (outside it during a drag). Keys
+// arrive raw once the view has been clicked, every key and its release, modifiers too: the Windows virtual
+// key and the PC scan code (set 1, plus 0x100 for an extended key), the character the key types on the
+// current layout (ch, 0 for none) and the one it types with no modifiers (plain). A Char carries a typed
+// character alone, for a platform that delivers characters apart from keys.
+struct PixelInput {
+    enum Type { Down, Up, Move, Drag, RightDown, RightUp, RightDrag, Wheel, KeyDown, KeyUp, Char, Focus, Blur } type = Move;
+    int x = 0, y = 0;
+    double wheel = 0;                     // notches, up positive
+    unsigned vk = 0, scan = 0, ch = 0, plain = 0;
+    bool shift = false, ctrl = false, alt = false;
+};
+
+// An app's own GUI inside the skin, such as a tracker's screen: a custom widget of kind "pixels" whose
+// "key" names one the processor gave State (State::setPixels). The widget shows it scaled to its rect pixel
+// for pixel and hands it the mouse, and once clicked the keyboard whole. Called on the GUI thread only.
+class Pixels {
+public:
+    virtual ~Pixels() = default;
+    virtual int width() const = 0;
+    virtual int height() const = 0;
+    // Copies what changed since the last call that returned true into px (width * height, 0x00RRGGBB, row-major)
+    // and sets dirty to it as {x, y, w, h}; false, copying nothing, when nothing did. With whole, a widget that has
+    // just appeared, it copies all of it and returns true.
+    virtual bool frame(uint32_t* px, int dirty[4], bool whole) = 0;
+    virtual bool input(const PixelInput& e) = 0;   // keys: true when used
+    virtual void tick() {}                          // about 30 times a second while the widget is shown
+};
+
+// ---- the host's transport ------------------------------------------------------------------------------
+
+// What the host's transport said at the first frame of the block; the format layer sets it before every
+// Processor::process. A field the host did not report leaves its has* false.
+struct Transport {
+    bool playing = false;
+    bool hasTempo = false, hasBeats = false;
+    double tempo = 120;                   // quarter notes a minute
+    double beats = 0;                     // the song position, in quarter notes
+};
+
+// The product's skin: the copy embedded at build time, or HOLLOW_SKIN_DIR when set.
+std::shared_ptr<Skin> loadSkin();
+const std::vector<ParamDef>& skinParams(const Skin&);
+class State;
+// A fresh instance's default MIDI assignments (the skin's learn.defaults); the formats call it once
+// after creating the State.
+void applyLearnDefaults(State&, const Skin&);
+
+// Parameter values and GUI state of one plug-in instance, shared by the audio thread, the
+// host wrapper and the editor. Values are plain (min..max). get/set are lock-free.
+class State {
+public:
+    explicit State(std::vector<ParamDef> defs);
+    ~State();
+    size_t size() const;
+    const ParamDef& def(size_t i) const;
+    int indexOfHostId(uint32_t hostId) const;   // -1 if unknown
+    int indexOf(const std::string& id) const;   // -1 if unknown
+    double get(size_t i) const;
+    void set(size_t i, double plain);           // clamps and snaps to steps
+    double toNormal(size_t i, double plain) const;
+    double fromNormal(size_t i, double normal) const;
+    std::string text(size_t i, double plain) const;
+    bool parse(size_t i, const std::string& text, double& plain) const;
+
+    // Whole-instance state for the host (param values by id plus the GUI state), and back.
+    std::string save() const;
+    bool load(const std::string& blob);
+    // Counts loads, odd while one is running: a processor that acts on param changes compares it
+    // to tell a restored session from an edit.
+    unsigned loads() const;
+
+    // GUI state (open pages, toggled widgets, scale) kept here so it outlives the editor.
+    std::string ui() const;
+    void setUi(const std::string& s);
+
+    // The params hosts see, in params.json order (VST2 index k = hostParam(k)).
+    size_t hostCount() const;
+    size_t hostParam(size_t k) const;           // State index of the k-th host param
+    int hostSlot(size_t i) const;               // host position of State index i, -1 for host: false
+
+    // Text data saved with the instance (editable text, envelope shapes), keyed by the skin. GUI thread.
+    std::string data(const std::string& key) const;
+    bool hasData(const std::string& key) const;   // true once set, even to ""
+    void setData(const std::string& key, const std::string& value);
+
+    // MIDI the GUI plays (on-screen keys, wheels): the editor pushes on the GUI thread, the format
+    // layer pops on the audio thread and hands each message to Processor::midi at offset 0.
+    void pushMidi(const uint8_t* bytes, int size);   // up to 3 bytes
+    bool popMidi(uint8_t bytes[3], int& size);
+
+    // What the audio side knows and the GUI shows. The format layer calls midiIn for every incoming
+    // MIDI message and setLoad once per block (audio thread); a Processor may call setVoices.
+    void midiIn(const uint8_t* bytes, int size);   // key and wheel display, MIDI learn, assigned CCs
+    void setLoad(double fraction);                 // time spent in process() / block duration
+    void setVoices(int voices);
+    bool noteHeld(int note) const;                  // from a note on to its note off; a sustain pedal is not followed
+    int pitchBend() const;                          // -8192..8191
+    int cc(int number) const;                       // last value 0..127, -1 if never received
+    unsigned midiInCount() const;                   // grows with every incoming message
+    double load() const;
+    int voices() const;                             // -1 if never reported
+    bool modified() const;                          // a value changed since the last save or load
+
+    // The output monitor. The format layer reports each block's peak per channel; the GUI takes the
+    // highest since it last looked (a meter's "source": "level_l" / "level_r"). A processor may publish
+    // up to 256 values 0..1 for a plot's "source": "scope" (a spectrum, a waveform); any thread.
+    void peak(float left, float right);
+    float takePeak(int channel);
+    void setScope(const float* values, int count);
+    int scope(float* out, int max) const;           // the count; copies up to max values
+    unsigned scopeCount() const;                    // grows with every setScope
+
+    // MIDI learn: the next incoming CC after learn(param) is assigned to that param (saved with the
+    // instance); an assigned CC then sets its param's normalized value.
+    void learn(int param);                          // -1 stops learning
+    int learning() const;
+    std::vector<std::pair<int, int>> midiMap() const;   // (cc, param) sorted by cc
+    void assign(int cc, int param);                  // param -1 removes the assignment
+
+    // The product's own views by name, for "pixels" widgets (above). Set once, before an editor opens.
+    void setPixels(const std::string& name, std::shared_ptr<Pixels> view);
+    std::shared_ptr<Pixels> pixels(const std::string& name) const;
+private:
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
+};
+
+// ---- sound (optional) -----------------------------------------------------------------------
+
+class Processor {
+public:
+    virtual ~Processor() = default;
+    virtual void prepare(double sampleRate, int maxFrames) { (void)sampleRate; (void)maxFrames; }
+    virtual void midi(int frameOffset, const uint8_t* bytes, int size) { (void)frameOffset; (void)bytes; (void)size; }
+    // in/out: channel pointers; outputs arrive zeroed, so a hollow product can leave them alone.
+    virtual void process(const float* const* in, float* const* out, int frames) { (void)in; (void)out; (void)frames; }
+
+    // The host is about to save the instance (main thread): put what State does not hold into its
+    // text data now.
+    virtual void saving() {}
+
+    // Set by the format layer before every process(): the host's transport at the block's first frame.
+    Transport transport;
+
+    // Set by the format layer; call from process() to send MIDI out (needs Info::midiOut).
+    std::function<void(int frameOffset, const uint8_t* bytes, int size)> sendMidi;
+    // Set by the format layer; any thread. The processor changed params itself (a patch load), so the
+    // host re-reads every value; it records none of them as automation.
+    std::function<void()> paramsChanged;
+};
+
+// ---- envelope models (optional) ---------------------------------------------------------------
+
+// A stage_env widget with "model": "<name>" draws the curve that model returns, on a time axis in seconds.
+// `in` holds the widget's "inputs" by name: a param's value or a number.
+// During a drag the values are fractional, between a param's steps.
+// Called on the GUI thread, many times per mouse move, so keep it fast.
+struct StageCurve {
+    std::vector<float> t, v;         // vertices: seconds and level. [0, keyOff) from key on, the rest from key off
+    int keyOff = 0;
+    std::vector<int> corner;         // per point: the vertex where it is reached, -1 if never
+    double lo = 0, hi = 1;           // level range
+    bool db = false;                 // levels are in dB
+};
+using StageModel = std::function<StageCurve(const std::map<std::string, double>& in)>;
+void registerStageModel(const std::string& name, StageModel model);
+
+// ---- implemented once per product (plugins/<name>/plugin.cpp) ---------------------------------
+
+const Info& pluginInfo();
+std::unique_ptr<Processor> createProcessor(State& state);
+
+// ---- the editor window ------------------------------------------------------------------------
+
+// The keys the editor knows by name. Letters and digits are not here: they travel beside these as the
+// physical key's ASCII code, so this stays a list of editing commands.
+enum Key { KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyHome, KeyEnd, KeyBackspace, KeyDelete, KeyEnter, KeyEscape, KeyTab, KeySelectAll };
+
+// Opt-in keyboard diagnostics, for working out where a host's keys go: with HOLLOW_KEYLOG set to a file
+// path, the keyboard path appends what it sees there. One pointer test when the variable is unset.
+void keyLog(const char* fmt, ...);
+bool keyLogOn();
+
+class Editor {
+public:
+    // Implemented by the format layer; called on the GUI thread, for host params only.
+    struct Host {
+        virtual ~Host() = default;
+        virtual void beginEdit(size_t param) = 0;
+        virtual void edit(size_t param, double plain) = 0;   // value is already in State
+        virtual void endEdit(size_t param) = 0;
+        virtual bool resize(int width, int height) { (void)width; (void)height; return false; }
+        // True in the standalone app, whose audio and MIDI settings a skin's "standalone" action opens.
+        virtual bool standalone() const { return false; }
+    };
+
+    Editor(std::shared_ptr<Skin> skin, State& state, Host& host);
+    ~Editor();
+    bool attach(void* parent);            // HWND on Windows, NSView* on macOS, an X11 Window id on Linux
+    void detach();
+    int width() const;                    // window size in pixels: root view size * scale
+    int height() const;
+    double scale() const;                 // one of the skin's "scales", else 1..4; remembered in State::ui()
+    void setScale(double s);              // resizes the window and calls Host::resize
+    // A key the host delivered through its plug-in API rather than to the window, for the hosts that keep
+    // the keyboard to themselves (REAPER's "send all keyboard input to plugin"). `character` is what the key
+    // typed, as the host reported it and so as the layout made it, 0 for a key that types nothing; which key
+    // that was is worked out here. True when the editor used it, which is what such a host takes as "mine";
+    // false leaves the key to the host.
+    bool key(Key k, unsigned character, bool shift, bool ctrl, bool alt);
+private:
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
+};
+
+// Offscreen render of a view (tools and tests): RGBA8 straight alpha, row-major.
+bool renderView(const Skin& skin, const std::string& view, std::vector<uint8_t>& rgba, int& width, int& height,
+                const std::string& stateBlob = {},   // stateBlob: a saved state ("hollow-state 1") to render with
+                double scale = 0);                   // one of the skin's "scales" (0: the state's, else 1x)
+
+} // namespace hollow

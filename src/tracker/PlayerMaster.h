@@ -167,8 +167,14 @@ private:
 	void applySettingsToPlayerController(PlayerController& playerController, const TMixerSettings& settings);
 
 	pp_int32 limiterDrive;
-	
+
+	// The plug-in's host decides the mixing rate and block, whatever the settings say (setHostAudio)
+	pp_int32 hostRate, hostBufferSize;
+
 public:
+	void setHostAudio(pp_int32 sampleRate, pp_int32 bufferSize);
+	class MasterMixer* getMixer() { return mixer; }
+
 	PlayerMaster(pp_uint32 numDevices = DefaultMaxDevices);
 	~PlayerMaster();
 	

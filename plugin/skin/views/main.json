@@ -1,0 +1,228 @@
+{
+ "size": [
+  1315,
+  949
+ ],
+ "fill": {
+  "image": "backgrounds/main"
+ },
+ "widgets": [
+  {
+   "type": "custom",
+   "name": "tracker",
+   "rect": [
+    14,
+    14,
+    1024,
+    720
+   ],
+   "kind": "pixels",
+   "key": "tracker",
+   "zoom": "gui.tracker_scale",
+   "panX": "gui.tracker_pan_x",
+   "panY": "gui.tracker_pan_y"
+  },
+  {
+   "type": "custom",
+   "name": "tracker_pan_x",
+   "kind": "pan",
+   "rect": [
+    14,
+    739,
+    1024,
+    9
+   ],
+   "param": "gui.tracker_pan_x",
+   "zoom": "gui.tracker_scale",
+   "vertical": false,
+   "colour": "#c084ffff",
+   "showIf": {
+    "param": "gui.tracker_scale",
+    "equals": 2
+   },
+   "tip": "Pan the tracker: drag, click or scroll"
+  },
+  {
+   "type": "custom",
+   "name": "tracker_pan_y",
+   "kind": "pan",
+   "rect": [
+    1043,
+    14,
+    9,
+    720
+   ],
+   "param": "gui.tracker_pan_y",
+   "zoom": "gui.tracker_scale",
+   "vertical": true,
+   "colour": "#c084ffff",
+   "showIf": {
+    "param": "gui.tracker_scale",
+    "equals": 2
+   },
+   "tip": "Pan the tracker: drag, click or scroll"
+  },
+  {
+   "type": "embed",
+   "name": "column",
+   "rect": [
+    1052,
+    8,
+    255,
+    732
+   ],
+   "view": "column"
+  },
+  {
+   "type": "custom",
+   "name": "piano",
+   "rect": [
+    58,
+    756,
+    1198,
+    161
+   ],
+   "kind": "piano",
+   "first": 24,
+   "count": 73,
+   "velocity": 100,
+   "glide": false,
+   "keyImages": {
+    "c": "keyboard/key_c",
+    "d": "keyboard/key_d",
+    "e": "keyboard/key_e",
+    "f": "keyboard/key_f",
+    "g": "keyboard/key_g",
+    "a": "keyboard/key_a",
+    "b": "keyboard/key_b",
+    "black": "keyboard/key_black",
+    "top": "keyboard/key_c_top"
+   },
+   "showIf": {
+    "param": "mode",
+    "notEquals": 2
+   }
+  },
+  {
+   "type": "custom",
+   "name": "piano_zones",
+   "rect": [
+    58,
+    756,
+    1198,
+    161
+   ],
+   "kind": "piano",
+   "first": 24,
+   "count": 73,
+   "velocity": 100,
+   "glide": false,
+   "keyImages": {
+    "c": "keyboard/key_c",
+    "d": "keyboard/key_d",
+    "e": "keyboard/key_e",
+    "f": "keyboard/key_f",
+    "g": "keyboard/key_g",
+    "a": "keyboard/key_a",
+    "b": "keyboard/key_b",
+    "black": "keyboard/key_black",
+    "top": "keyboard/key_c_top"
+   },
+   "showIf": {
+    "param": "mode",
+    "equals": 2
+   },
+   "zones": [
+    {
+     "from": "trigger.pitch_from",
+     "count": "trigger.pitch_count",
+     "colour": "#39ff7aff"
+    },
+    {
+     "from": "trigger.patterns_from",
+     "count": "trigger.patterns_count",
+     "colour": "#3a9dffff"
+    }
+   ],
+   "marks": [
+    {
+     "key": "trigger.home",
+     "colour": "#39ff7aff",
+     "zone": 0
+    },
+    {
+     "key": "trigger.key",
+     "colour": "#3a9dffff",
+     "zone": 1
+    }
+   ],
+   "pick": {
+    "param": "trigger.key",
+    "from": "trigger.patterns_from",
+    "count": "trigger.patterns_count"
+   },
+   "action": {
+    "modal": "dialog_patterns"
+   },
+   "tip": "Right-click a blue key to choose the patterns it plays"
+  },
+  {
+   "type": "custom",
+   "name": "zones",
+   "rect": [
+    58,
+    919,
+    1198,
+    20
+   ],
+   "kind": "key_zones",
+   "first": 24,
+   "count": 73,
+   "keyImages": {
+    "c": "keyboard/key_c",
+    "d": "keyboard/key_d",
+    "e": "keyboard/key_e",
+    "f": "keyboard/key_f",
+    "g": "keyboard/key_g",
+    "a": "keyboard/key_a",
+    "b": "keyboard/key_b",
+    "black": "keyboard/key_black",
+    "top": "keyboard/key_c_top"
+   },
+   "showIf": {
+    "param": "mode",
+    "equals": 2
+   },
+   "text": {
+    "font": "mt_value"
+   },
+   "zones": [
+    {
+     "from": "trigger.pitch_from",
+     "count": "trigger.pitch_count",
+     "colour": "#39ff7aff",
+     "label": "Pitch"
+    },
+    {
+     "from": "trigger.patterns_from",
+     "count": "trigger.patterns_count",
+     "colour": "#3a9dffff",
+     "label": "Patterns"
+    }
+   ],
+   "marks": [
+    {
+     "key": "trigger.home",
+     "colour": "#39ff7aff",
+     "zone": 0
+    },
+    {
+     "key": "trigger.key",
+     "colour": "#3a9dffff",
+     "zone": 1
+    }
+   ],
+   "tip": "Drag a zone to move it, its ends to stretch it, a mark to move Home or the picked key"
+  }
+ ]
+}

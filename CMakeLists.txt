@@ -20,10 +20,28 @@
 #
 
 cmake_minimum_required(VERSION 3.10)
+
+# The DAW plug-in (plugin/): the tracker inside the Hollow framework (hollow/), every format into bin/<format>.
+# It builds instead of the tracker, and downloads the plug-in SDKs on the first configure:
+#   cmake -S . -B build/plugin -DMILKYTRACKER_PLUGIN=ON && cmake --build build/plugin --config Release
+option(MILKYTRACKER_PLUGIN "Build the DAW plug-in instead of the tracker" OFF)
+if(MILKYTRACKER_PLUGIN)
+    cmake_policy(VERSION 3.22)
+    # Before project(): C++17, the static C++ runtime, and on macOS universal binaries
+    include(hollow/cmake/HollowDefaults.cmake)
+endif()
+
 project(MilkyTracker)
 
-# Set C++ standard to C++11
-set(CMAKE_CXX_STANDARD 11)
+if(MILKYTRACKER_PLUGIN)
+    if(APPLE)
+        enable_language(OBJC OBJCXX)   # Hollow's mac.mm and the tracker's Cocoa dialogs
+    endif()
+    add_definitions(-DMILKYTRACKER_PLUGIN)
+else()
+    # Set C++ standard to C++11
+    set(CMAKE_CXX_STANDARD 11)
+endif()
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Enable IDE solution folders
@@ -173,7 +191,9 @@ else()
         cmake_policy(SET CMP0004 OLD)
     endif()
 
-    find_package(SDL2 REQUIRED)
+    if(NOT MILKYTRACKER_PLUGIN)   # the plug-in draws into memory and plays through the host
+        find_package(SDL2 REQUIRED)
+    endif()
 endif()
 
 # Prefer static linkage under OS X for libraries located with find_package()
@@ -194,7 +214,7 @@ if(UNIX)
       find_package(ZZIPLIB)
     endif()
 
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND NOT MILKYTRACKER_PLUGIN)
         find_package(ALSA)
         find_package(JACK)
 
@@ -225,6 +245,17 @@ endif()
 # Restore library suffixes
 if(APPLE)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ${SUFFIXES_ORIG})
+endif()
+
+if(MILKYTRACKER_PLUGIN)
+    enable_testing()   # ctest from the build folder: plugin/CMakeLists.txt adds the checks
+    add_subdirectory(src/compression)
+    add_subdirectory(src/fx)
+    add_subdirectory(src/milkyplay)
+    add_subdirectory(src/ppui)
+    add_subdirectory(hollow)
+    add_subdirectory(plugin)
+    return()
 endif()
 
 add_subdirectory(docs)

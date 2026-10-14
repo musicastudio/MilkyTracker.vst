@@ -104,7 +104,10 @@ private:
 	bool detachDevice();
 
 	void reset();
-	
+
+	bool hostReady() const;
+	void hostRestart(mp_sint32 order, mp_sint32 row, bool resetMixer);
+
 public:
 	~PlayerController();
 	
@@ -208,6 +211,18 @@ private:
 	mp_sint32 getCurrentBeatIndex();
 
 public:
+	// A plug-in's host transport and MIDI triggers, called on the audio thread between mixes. None of these
+	// waits for the mixer; while the editor has the player suspended they do nothing and return false.
+	bool hostPlaySong(mp_sint32 order, mp_sint32 row);
+	bool hostPlayPatterns(const mp_ubyte* patterns, mp_sint32 count, bool loop);
+	bool hostStop();
+	void hostTickRate(double ticksPerSecond);		// 0: the song's own BPM again
+	void hostTranspose(mp_sint32 semitones);
+	mp_sint32 hostSpeed() const;					// ticks a row, as the player has it now
+	bool hostIsPlaying() const { return isPlaying(); }
+	class Mixable* hostDevice() const;				// the mixer device this controller plays through
+	void hostPosition(mp_sint32& order, mp_sint32& row, mp_sint32& ticker) const;	// where the player is, not what is heard
+
 	bool isSamplePlaying(const TXMSample& smp, mp_sint32 channel, mp_sint32& pos, mp_sint32& vol, mp_sint32& pan);
 	bool isEnvelopePlaying(const TEnvelope& envelope, mp_sint32 envelopeType, mp_sint32 channel, mp_sint32& pos);
 	bool isNotePlaying(mp_sint32 ins, mp_sint32 channel, mp_sint32& note, bool& muted);

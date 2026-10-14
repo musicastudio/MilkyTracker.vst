@@ -61,7 +61,7 @@ if(APPLE OR WIN32)
 endif()
 
 # macOS: Build submodules using their own build systems
-if(APPLE)
+if(APPLE AND NOT MILKYTRACKER_PLUGIN)   # autotools builds, one architecture only: the universal plug-in goes without LHA and ZIP
     include(ExternalProject)
 
     # Collect compiler flags to pass to the external build systems
@@ -196,6 +196,8 @@ if(WIN32)
             SOURCE_DIR ${ZLIB_SUBMODULE_DIR}
             PREFIX ${ZLIB_DESTDIR}
             CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+            # zlib's own CMakeLists predates 3.5, which CMake 4 refuses unless told
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5
             -DCMAKE_C_FLAGS_DEBUG=${CMAKE_C_FLAGS_DEBUG}
             -DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}
             -DCMAKE_C_FLAGS_RELWITHDEBINFO=${CMAKE_C_FLAGS_RELWITHDEBINFO}

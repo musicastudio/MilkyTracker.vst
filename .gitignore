@@ -1,6 +1,11 @@
 # The build output folders
 build/
 build-debug/
+# The plug-in's formats (MILKYTRACKER_PLUGIN), and Blender's backups and Python's caches
+bin/
+installer/dist/
+*.blend1
+__pycache__/
 
 # Editor config files
 .vscode/

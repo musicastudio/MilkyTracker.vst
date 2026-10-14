@@ -45,7 +45,20 @@
 		delete driverList[i]; \
 	delete[] driverList;
 
-#if defined(DRIVER_WIN32)
+#if defined(MILKYTRACKER_PLUGIN)
+//////////////////////////////////////////////////////////////////
+//		Plug-in: the host pulls the mix (MasterMixer::mixerHandler)
+//////////////////////////////////////////////////////////////////
+#include "AudioDriver_NULL.h"
+
+AudioDriverManager::AudioDriverManager() :
+	defaultDriverIndex(0)
+{
+	ALLOC_DRIVERLIST(1);
+	driverList[0] = new AudioDriver_NULL();
+}
+
+#elif defined(DRIVER_WIN32)
 //////////////////////////////////////////////////////////////////
 //					 Windows implementation
 //////////////////////////////////////////////////////////////////

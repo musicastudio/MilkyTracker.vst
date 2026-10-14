@@ -92,6 +92,10 @@ public:
 	bool removeDevice(Mixable* device, bool blocking = true); 
 	bool isDeviceRemoved(Mixable* device);
 
+	// Added and not on its way out: a plug-in's audio thread may use the device's owner until it mixes
+	// again, since a removal waits for that mix before the owner goes
+	bool isDeviceAlive(Mixable* device) const;
+
 	bool pauseDevice(Mixable* device, bool blocking = true);
 	bool resumeDevice(Mixable* device);
 	bool isDevicePaused(Mixable* device);

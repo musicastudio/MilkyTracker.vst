@@ -1,0 +1,204 @@
+{
+ "format": 1,
+ "name": "MilkyTracker",
+ "root": "main",
+ "density": 1.5,
+ "scales": [
+  1,
+  1.5,
+  2
+ ],
+ "vars": {},
+ "menu": {
+  "font": "mt_text",
+  "hoverFont": "mt_value",
+  "fill": "#1d1826f4",
+  "border": "#5a4c6eff",
+  "hoverFill": "#4a3a68ff",
+  "shadow": "#0000008c",
+  "separator": "#4a4058ff",
+  "rowHeight": 20,
+  "separatorHeight": 5,
+  "pad": [
+   8,
+   4,
+   8,
+   4
+  ],
+  "place": "over",
+  "releaseGuard": 680,
+  "keys": "escape"
+ },
+ "tooltip": {
+  "font": "mt_text",
+  "fill": "#1d1826f0",
+  "border": "#5a4c6eff",
+  "pad": [
+   6,
+   4,
+   6,
+   4
+  ],
+  "delay": 700
+ },
+ "fonts": {
+  "mt_value": {
+   "caret": "#f2eff7ff",
+   "selection": "#6a4fa0c0"
+  },
+  "mt_text": {
+   "caret": "#f2eff7ff",
+   "selection": "#6a4fa0c0"
+  }
+ },
+ "steppers": {
+  "width": 9,
+  "plates": {
+   "panels/label_plate_inv": [
+    "buttons/step_down_inv",
+    "buttons/step_up_inv"
+   ]
+  }
+ },
+ "images": {
+  "backgrounds/dialog": {
+   "surface": false
+  },
+  "backgrounds/main": {
+   "surface": false
+  },
+  "buttons/dark_wide": {
+   "tiles": 4,
+   "surface": false,
+   "slice": [
+    0,
+    10,
+    0,
+    10
+   ]
+  },
+  "buttons/step_down_inv": {
+   "tiles": 2,
+   "surface": false
+  },
+  "buttons/step_up_inv": {
+   "tiles": 2,
+   "surface": false
+  },
+  "displays/op_screen": {
+   "surface": false,
+   "slice": [
+    6,
+    6,
+    6,
+    6
+   ]
+  },
+  "keyboard/key_a": {
+   "tiles": 2,
+   "axis": "x",
+   "surface": false
+  },
+  "keyboard/key_a_low": {
+   "tiles": 2,
+   "axis": "x",
+   "surface": false
+  },
+  "keyboard/key_b": {
+   "tiles": 2,
+   "axis": "x",
+   "surface": false
+  },
+  "keyboard/key_black": {
+   "tiles": 2,
+   "axis": "x",
+   "surface": false
+  },
+  "keyboard/key_c": {
+   "tiles": 2,
+   "axis": "x",
+   "surface": false
+  },
+  "keyboard/key_c_top": {
+   "tiles": 2,
+   "axis": "x",
+   "surface": false
+  },
+  "keyboard/key_d": {
+   "tiles": 2,
+   "axis": "x",
+   "surface": false
+  },
+  "keyboard/key_e": {
+   "tiles": 2,
+   "axis": "x",
+   "surface": false
+  },
+  "keyboard/key_f": {
+   "tiles": 2,
+   "axis": "x",
+   "surface": false
+  },
+  "keyboard/key_g": {
+   "tiles": 2,
+   "axis": "x",
+   "surface": false
+  },
+  "knobs/rotary_large": {
+   "tiles": 128,
+   "surface": false
+  },
+  "panels/group_box_dark_tab": {
+   "surface": false,
+   "slice": [
+    8,
+    8,
+    8,
+    8
+   ]
+  },
+  "panels/group_tab_dark": {
+   "surface": false,
+   "slice": [
+    0,
+    20,
+    0,
+    20
+   ]
+  },
+  "panels/inset_light_inv": {
+   "surface": false,
+   "slice": [
+    15,
+    15,
+    15,
+    15
+   ]
+  },
+  "panels/label_plate_inv": {
+   "surface": false,
+   "slice": [
+    3,
+    3,
+    3,
+    3
+   ]
+  },
+  "scrollbars/library_thumb_flat": {
+   "surface": false,
+   "slice": [
+    5,
+    0,
+    5,
+    0
+   ]
+  },
+  "scrollbars/list_track": {
+   "surface": false
+  }
+ },
+ "disabled": {
+  "saturation": 0.15,
+  "brightness": 0.45
+ }
+}

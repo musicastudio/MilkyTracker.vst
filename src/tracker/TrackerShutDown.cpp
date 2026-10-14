@@ -111,11 +111,11 @@ bool Tracker::checkForChangesOpenModule()
 	return checkForChanges();
 }
 
-bool Tracker::shutDown()
+bool Tracker::shutDown(bool askToSave/* = true*/)
 {
 	pp_int32 i;
 	ModuleEditor* currentEditor = moduleEditor;
-	for (i = 0; i < tabManager->getNumTabs(); i++)
+	for (i = 0; askToSave && i < tabManager->getNumTabs(); i++)
 	{
 		moduleEditor = tabManager->getModuleEditorFromTabIndex(i);
 		bool res = checkForChanges();
@@ -257,5 +257,16 @@ bool Tracker::shutDown()
 mp_sint32 Tracker::saveModule(const PPSystemString& fileName)
 {
 	return moduleEditor->saveBackup(fileName);
+}
+
+bool Tracker::restoreModule(const PPSystemString& fileName, const PPSystemString& name)
+{
+	playerController->suspendPlayer();
+	bool res = moduleEditor->openSong(fileName, name);
+	updateAfterLoad(res, false, false);
+	screen->paint();
+	updateWindowTitle(moduleEditor->getModuleFileName());
+	playerController->resumePlayer(false);
+	return res;
 }
 

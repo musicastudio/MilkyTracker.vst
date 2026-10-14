@@ -232,6 +232,11 @@ PlayerSTD::PlayerSTD(mp_uint32 frequency,
 	patDelayCount = 0;
 	haltFlag = false;
 
+	tickRate = 0;
+	transpose = 0;
+	patternQueueLen = patternQueuePos = 0;
+	patternQueueLoop = false;
+
 	options[PlayModeOptionPanning8xx] = true;
 	options[PlayModeOptionPanningE8x] = false;
 	options[PlayModeOptionForcePTPitchLimit] = true;
@@ -240,6 +245,35 @@ PlayerSTD::PlayerSTD(mp_uint32 frequency,
 PlayerSTD::~PlayerSTD()
 {
 	freeMemory();
+}
+
+void PlayerSTD::setPatternQueue(const mp_ubyte* patterns, mp_sint32 count, bool loop)
+{
+	if (count < 0)
+		count = 0;
+	if (count > (mp_sint32)sizeof(patternQueue))
+		count = sizeof(patternQueue);
+	if (count)
+		memcpy(patternQueue, patterns, count);
+	patternQueueLen = count;
+	patternQueuePos = 0;
+	patternQueueLoop = loop;
+}
+
+// The queue's next pattern becomes the one to play; false when it ran out and does not loop.
+bool PlayerSTD::nextQueuedPattern()
+{
+	if (++patternQueuePos >= patternQueueLen)
+	{
+		if (!patternQueueLoop)
+		{
+			patternQueueLen = 0;
+			return false;
+		}
+		patternQueuePos = 0;
+	}
+	patternIndexToPlay = patternQueue[patternQueuePos];
+	return true;
 }
 
 mp_sint32 PlayerSTD::adjustFrequency(mp_uint32 frequency)
@@ -289,7 +323,15 @@ void PlayerSTD::timerHandler(mp_sint32 currentBeatPacket)
 		statusEventListener->timerTickStarted(*this, *module);
 
 	mp_int64 dummy = (mp_int64)BPMCounter;
-	dummy+=(mp_int64)adder;
+	if (tickRate > 0 && getMixFrequency())
+	{
+		// one beat packet's share of a tick, from the packet's real length: at 44.1 kHz a packet is 176
+		// samples, not 176.4, so the song's own BPM runs 0.23% fast there and a host's tempo must not
+		double add = tickRate * (double)getBeatPacketSize() / (double)getMixFrequency() * 4294967296.0;
+		dummy += add < 4294967295.0 ? (mp_int64)add : (mp_int64)4294967295u;
+	}
+	else
+		dummy+=(mp_int64)adder;
 	BPMCounter=(mp_sint32)dummy;
 	
 	// check overflow-carry 
@@ -2252,7 +2294,14 @@ void PlayerSTD::progressRow()
 			TModuleChannel *chnInf = &chninfo[chn];
 
 			mp_sint32 pp = slotsize*chn;
-			mp_sint32 note = chnInf->currentnote = row[pp];
+			mp_sint32 note = row[pp];
+			if (transpose && note > 0 && note <= XModule::NOTE_LAST)
+			{
+				note += transpose;
+				if (note < 1) note = 1;
+				if (note > XModule::NOTE_LAST) note = XModule::NOTE_LAST;
+			}
+			chnInf->currentnote = note;
 			
 			mp_sint32 i    = row[pp+1];
 
@@ -2981,7 +3030,13 @@ void PlayerSTD::tickhandler()
 				{
 					rowcnt = -1;
 					startNextRow = -1;
-					
+
+					if (patternQueueLen && !nextQueuedPattern())
+					{
+						halt();
+						return;
+					}
+
 					if (statusEventListener)
 						statusEventListener->patternEndReached(*this, *module, poscnt);
 				}
@@ -3023,6 +3078,16 @@ nextrow:
 				{
 					// play next order
 					setNewPosition(poscnt+1);
+				}
+				// A queue of patterns: the next one, or the first again
+				else if (patternQueueLen)
+				{
+					if (!nextQueuedPattern())
+					{
+						halt();
+						return;
+					}
+					RESET_ALL_LOOPING
 				}
 				// We have one pattern to play but repeating isn't allowed, so stop here
 				else if (!repeat)

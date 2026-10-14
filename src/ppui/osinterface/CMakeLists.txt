@@ -122,6 +122,16 @@ elseif(HAIKU)
             posix
     )
     target_compile_options(osinterface PRIVATE -iquote ${PROJECT_SOURCE_DIR}/src/ppui)
+elseif(MILKYTRACKER_PLUGIN)
+    # The Linux plug-in: no SDL, its dialogs zenity's or kdialog's (plugin/PPDialogs_LINUX.cpp)
+    target_sources(osinterface
+        PRIVATE
+            plugin/PPDialogs_LINUX.cpp
+            posix/PPMutex.cpp
+            posix/PPPath_POSIX.cpp
+            posix/PPSystem_POSIX.cpp
+    )
+    target_include_directories(osinterface PUBLIC posix)
 else()
     target_sources(osinterface
         PRIVATE

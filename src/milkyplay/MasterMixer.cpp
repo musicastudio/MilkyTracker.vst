@@ -367,6 +367,17 @@ bool MasterMixer::resumeDevice(Mixable* device)
 	return false;
 }
 
+bool MasterMixer::isDeviceAlive(Mixable* device) const
+{
+	for (mp_uint32 i = 0; i < numDevices; i++)
+	{
+		if (devices[i].mixable == device)
+			return !devices[i].markedForRemoval;
+	}
+
+	return false;
+}
+
 bool MasterMixer::isDevicePaused(Mixable* device)
 {
 	for (mp_uint32 i = 0; i < numDevices; i++)

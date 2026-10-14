@@ -1208,8 +1208,10 @@ public:
 		radioGroup->setHorizontal(true);
 		radioGroup->addItem("x1");
 		radioGroup->addItem("x2");
+#ifndef MILKYTRACKER_PLUGIN	// the plug-in zooms its fixed tracker area x1 or x2, at once and without a restart
 		radioGroup->addItem("x4");
 		radioGroup->addItem("x8");
+#endif
 
 		container->addControl(radioGroup);
 	}
@@ -1875,8 +1877,11 @@ void SectionSettings::showRestartMessageBox()
 	if (tracker.settingsDatabase->restore("XRESOLUTION")->getIntValue() != tracker.settingsDatabaseCopy->restore("XRESOLUTION")->getIntValue() ||
 		tracker.settingsDatabase->restore("YRESOLUTION")->getIntValue() != tracker.settingsDatabaseCopy->restore("YRESOLUTION")->getIntValue() ||
 		tracker.settingsDatabase->restore("CLASSIC")->getIntValue() != tracker.settingsDatabaseCopy->restore("CLASSIC")->getIntValue() ||
-		tracker.settingsDatabase->restore("FLATCONTROLS")->getIntValue() != tracker.settingsDatabaseCopy->restore("FLATCONTROLS")->getIntValue() ||
-		tracker.settingsDatabase->restore("SCREENSCALEFACTOR")->getIntValue() != tracker.settingsDatabaseCopy->restore("SCREENSCALEFACTOR")->getIntValue())
+		tracker.settingsDatabase->restore("FLATCONTROLS")->getIntValue() != tracker.settingsDatabaseCopy->restore("FLATCONTROLS")->getIntValue()
+#ifndef MILKYTRACKER_PLUGIN
+		|| tracker.settingsDatabase->restore("SCREENSCALEFACTOR")->getIntValue() != tracker.settingsDatabaseCopy->restore("SCREENSCALEFACTOR")->getIntValue()
+#endif
+		)
 	{
 		SystemMessage message(*tracker.screen, SystemMessage::MessageChangeRestart);
 		message.show();

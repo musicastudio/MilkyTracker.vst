@@ -278,6 +278,13 @@ private:
 	// keep track of what positions we already visited (bitmap)
 	mp_ubyte		rowHits[256*256/8];
 	bool			isLooping;
+
+	double			tickRate;			// setTickRate
+	mp_sint32		transpose;			// setTranspose
+	mp_ubyte		patternQueue[64];	// setPatternQueue
+	mp_sint32		patternQueueLen, patternQueuePos;
+	bool			patternQueueLoop;
+	bool			nextQueuedPattern();
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	//					    this information is updated while the song plays
@@ -473,8 +480,18 @@ public:
 
 	// milkytracker
 	virtual void	playNote(mp_ubyte chn, mp_sint32 note, mp_sint32 ins, mp_sint32 vol = -1);
-							 
+
 	virtual void	setPanning(mp_ubyte chn, mp_ubyte pan) { chninfo[chn].pan = pan; }
+
+	// The plug-in drives these from the audio thread, between mixes.
+	// Ticks a second set from outside (a host's tempo) in place of the song's BPM; 0 follows the song again.
+	void			setTickRate(double ticksPerSecond) { tickRate = ticksPerSecond; }
+	// Semitones added to every note the pattern data plays.
+	void			setTranspose(mp_sint32 semitones) { transpose = semitones; }
+	mp_sint32		getTranspose() const { return transpose; }
+	// In pattern play: these patterns one after another (copied, up to 64), then from the first again when
+	// loop is set, else the player halts. An empty queue plays the one pattern as before.
+	void			setPatternQueue(const mp_ubyte* patterns, mp_sint32 count, bool loop);
 
 #ifdef MILKYTRACKER
 	friend class PlayerController;

@@ -111,7 +111,12 @@ void Tracker::buildDefaultSettings()
 	settingsDatabase->store("XRESOLUTION", PPScreen::getDefaultWidth());
 	settingsDatabase->store("YRESOLUTION", PPScreen::getDefaultHeight());
 
+#ifdef MILKYTRACKER_PLUGIN
+	// the plug-in's tracker sits in a fixed area of its window: x2 shows a quarter of it at a time (plugin/README.md)
+	settingsDatabase->store("SCREENSCALEFACTOR", 1);
+#else
 	settingsDatabase->store("SCREENSCALEFACTOR", std::getenv("NO_SCALE") != NULL ? 1 : 2);
+#endif
 
 	settingsDatabase->store("ENVELOPEEDITORSCALE", 256);
 

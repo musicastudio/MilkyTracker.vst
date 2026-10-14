@@ -462,6 +462,98 @@ void PlayerController::playPattern(mp_sint32 index, mp_sint32 songPosition, mp_s
 	criticalSection->leave(false);
 }
 
+bool PlayerController::hostReady() const
+{
+	return player && module && module->isModuleLoaded() && !suspended && !mixer->isDevicePaused(player);
+}
+
+// playSong's and stop's restart, without their critical section: the caller is the mixing thread itself
+void PlayerController::hostRestart(mp_sint32 order, mp_sint32 row, bool resetMixer)
+{
+	reset();
+	setNextOrderToPlay(-1);
+	setNextPatternToPlay(-1);
+	player->restart(order, row, resetMixer, panning);
+	// muting has been reset, restore it
+	for (mp_sint32 i = 0; i < numPlayerChannels; i++)
+		player->muteChannel(i, muteChannels[i]);
+}
+
+bool PlayerController::hostPlaySong(mp_sint32 order, mp_sint32 row)
+{
+	if (!hostReady())
+		return false;
+	player->setPatternToPlay(-1);
+	player->setPatternQueue(NULL, 0, false);
+	hostRestart(order, row, false);
+	player->setIdle(false);
+	patternPlay = false;
+	playRowOnly = false;
+	patternIndex = 0;
+	return true;
+}
+
+bool PlayerController::hostPlayPatterns(const mp_ubyte* patterns, mp_sint32 count, bool loop)
+{
+	if (!hostReady() || count <= 0)
+		return false;
+	player->setPatternToPlay(patterns[0]);
+	hostRestart(0, 0, false);
+	player->setPatternQueue(patterns, count, loop);
+	player->setIdle(false);
+	patternPlay = true;
+	playRowOnly = false;
+	patternIndex = patterns[0];
+	return true;
+}
+
+bool PlayerController::hostStop()
+{
+	if (!hostReady())
+		return false;
+	if (isPlaying() && !playRowOnly)
+	{
+		lastPosition = player->getOrder();
+		lastRow = player->getRow();
+		wasPlayingPattern = isPlayingPattern();
+	}
+	patternPlay = false;
+	playRowOnly = false;
+	player->setIdle(true);
+	player->setPatternQueue(NULL, 0, false);
+	hostRestart(0, 0, true);
+	return true;
+}
+
+void PlayerController::hostTickRate(double ticksPerSecond)
+{
+	if (player)
+		player->setTickRate(ticksPerSecond);
+}
+
+void PlayerController::hostTranspose(mp_sint32 semitones)
+{
+	if (player)
+		player->setTranspose(semitones);
+}
+
+Mixable* PlayerController::hostDevice() const
+{
+	return player;
+}
+
+mp_sint32 PlayerController::hostSpeed() const
+{
+	return player ? player->tickSpeed : 6;
+}
+
+void PlayerController::hostPosition(mp_sint32& order, mp_sint32& row, mp_sint32& ticker) const
+{
+	order = player ? player->poscnt : 0;
+	row = player ? player->rowcnt : 0;
+	ticker = player ? player->ticker : 0;
+}
+
 void PlayerController::setCurrentPatternIndex(mp_sint32 index)
 {
 	if (player)

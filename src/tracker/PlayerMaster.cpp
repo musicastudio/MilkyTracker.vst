@@ -166,7 +166,9 @@ PlayerMaster::PlayerMaster(pp_uint32 numDevices/* = DefaultMaxDevices*/) :
 	oldBufferSize(getPreferredBufferSize()),
 	forcePowerOfTwoBufferSize(false),
 	multiChannelKeyJazz(true),
-	multiChannelRecord(true)	
+	multiChannelRecord(true),
+	hostRate(0),
+	hostBufferSize(0)
 {
 	listener = new MasterMixerNotificationListener(*this);
 
@@ -260,10 +262,33 @@ PlayerController* PlayerMaster::getPlayerController(pp_int32 index)
 	return NULL;
 }
 
-bool PlayerMaster::applyNewMixerSettings(const TMixerSettings& settings, bool allowMixerRestart)
+void PlayerMaster::setHostAudio(pp_int32 sampleRate, pp_int32 bufferSize)
+{
+	hostRate = sampleRate;
+	hostBufferSize = bufferSize;
+	TMixerSettings settings;
+	applyNewMixerSettings(settings, true);
+}
+
+bool PlayerMaster::applyNewMixerSettings(const TMixerSettings& requested, bool allowMixerRestart)
 {
 	bool res = true;
 	bool restart = false;
+
+	// a plug-in mixes at the host's rate in the host's blocks: the settings page's choices of those are ignored
+	TMixerSettings settings;
+	settings.mixFreq = hostRate ? hostRate : requested.mixFreq;
+	settings.bufferSize = hostRate ? hostBufferSize : requested.bufferSize;
+	settings.powerOfTwoCompensation = hostRate ? -1 : requested.powerOfTwoCompensation;
+	settings.setAudioDriverName(hostRate ? NULL : requested.audioDriverName);
+	settings.mixerVolume = requested.mixerVolume;
+	settings.mixerShift = requested.mixerShift;
+	settings.resampler = requested.resampler;
+	settings.ramping = requested.ramping;
+	settings.rampin = requested.rampin;
+	settings.numPlayerChannels = requested.numPlayerChannels;
+	settings.numVirtualChannels = requested.numVirtualChannels;
+	settings.limiterDrive = requested.limiterDrive;
 
 	if (settings.audioDriverName)
 	{

@@ -473,10 +473,15 @@ public:
 	// Tracker startup
 	void startUp(bool forceNoSplash = false);
 		
-	// Tracker shutdown
-	bool shutDown();
-	
+	// Tracker shutdown; a plug-in going away saves no module (the host's session holds it) and asks nothing
+	bool shutDown(bool askToSave = true);
+
 	mp_sint32 saveModule(const PPSystemString& fileName);
+	// A host restoring a plug-in's session: the file replaces the current module under that name, unasked
+	bool restoreModule(const PPSystemString& fileName, const PPSystemString& name);
+	PlayerMaster* getPlayerMaster() { return playerMaster; }
+	PlayerController* getPlayerController() { return playerController; }
+	TrackerSettingsDatabase* getSettingsDatabase() { return settingsDatabase; }
 
 	void sendNoteDown(pp_int32 note, pp_int32 volume = -1);
 	void sendNoteUp(pp_int32 note);

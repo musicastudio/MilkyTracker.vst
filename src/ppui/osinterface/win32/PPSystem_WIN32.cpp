@@ -63,7 +63,11 @@ const SYSCHAR* System::getConfigFileName(SYSCHAR *fileName/* = NULL*/)
 	if (fileName)
 		_tcscat_s(szPath, MAX_PATH, fileName);
 	else
+#ifdef MILKYTRACKER_PLUGIN
+		_tcscat_s(szPath, MAX_PATH, _T("milkytracker_plugin.cfg"));   // its own: the standalone's window and driver settings are not a plug-in's
+#else
 		_tcscat_s(szPath, MAX_PATH, _T("milkytracker.cfg"));
+#endif
 	_tcscpy(buffer, szPath);
 
 	return buffer;
