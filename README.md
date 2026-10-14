@@ -22,13 +22,15 @@ Licensed GPL-3, as MilkyTracker is, see `COPYING` (MilkyPlay, its player library
 
 **The session.** The song goes into the host's project as an XM file and comes back out of it when the project opens, with each key's patterns and the column's settings. MilkyTracker's own settings stay its own, in a settings file of the plug-in's.
 
-**The editor** is drawn by [Hollow](hollow/docs/framework.md), the framework [FSVR](https://github.com/musicastudio/FSVR) is built on, from FSVR's Blender kit rendered in dark violet chrome to match MilkyTracker's logo. The column's text is in MilkyTracker's own bitmap fonts, the title in Analog Whispers beside MilkyTracker's milk carton, and what a mode leaves unused is greyed out. Window size 100%, 150% and 200% scales the whole window.
+**The editor** is powered by the [Hollow](hollow/docs/framework.md) framework.
 
 [plugin/README.md](plugin/README.md) has the detail: how each mode keeps time, the threads, the session, the checks, and what changed in MilkyTracker for it.
 
 ## Background
 
-MilkyTracker is Peter "pailes" Barth's tracker, carried on since by the MilkyTracker team (see `AUTHORS`) at [milkytracker/MilkyTracker](https://github.com/milkytracker/MilkyTracker). This repository is a fork of it that builds the plug-in instead of the app when asked to (`MILKYTRACKER_PLUGIN`), and the app as upstream does otherwise.
+MilkyTracker was created by Peter Barth ([pailes](https://github.com/milkypailes)), carried on since by the MilkyTracker team (see `AUTHORS`) at [milkytracker/MilkyTracker](https://github.com/milkytracker/MilkyTracker).
+
+This plug-in/VST version is a fork from the official repo, created by James Hansen ([jameshansen](https://github.com/jameshansen)).
 
 The plug-in drives MilkyTracker's own Tracker class, unchanged in what it does: it draws into a screen in memory instead of a window, plays through the host's audio instead of a driver of its own, and takes the host's tempo, transport and MIDI through a few calls added to its player (`PlayerController`'s `host*` calls, `PlayerSTD::setTickRate`, `setTranspose` and `setPatternQueue`). Everything around it, the column, the keyboard, the zones, the patterns dialog and the formats, is Hollow's, with the plug-in's own processor in `plugin/plugin.cpp`.
 
