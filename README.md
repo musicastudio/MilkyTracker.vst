@@ -4,7 +4,9 @@
 
 **MilkyTracker.vst** is [MilkyTracker](https://milkytracker.org), the Fasttracker II compatible tracker, running inside a DAW as an instrument plug-in: the whole tracker as it is, with a column of plug-in controls beside it and a keyboard below. It follows the host's tempo and transport (DAW Sync), plays a song's patterns from MIDI keys (MIDI Trigger), or plays as the tracker on its own (Free), and the song goes into the DAW's project with everything else. CLAP, VST3, VST2 and standalone on Windows, macOS and Linux, an AU on macOS and a 32-bit VST2 with a DXi on Windows, the same set FSVR builds, from the same framework.
 
-There is no release yet. [Building it](#building-it) makes every format.
+**[Download the latest release](https://github.com/musicastudio/MilkyTracker.vst/releases/latest)**: an installer for Windows that puts every format in place and keeps it up to date through [musica.studio](https://musica.studio/code/milkytracker), or each format as its own zip. macOS and Linux build from source for now ([Building it](#building-it)). The version follows MilkyTracker's last release, v1.05.01, but the tracker inside carries the 243 commits made to MilkyTracker since.
+
+Questions, bug reports and songs made with it go to the [Discord](https://discord.gg/VTMqnpvpj8).
 
 Licensed GPL-3, as MilkyTracker is, see `COPYING` (MilkyPlay, its player library, is New-BSD).
 
