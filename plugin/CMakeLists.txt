@@ -56,7 +56,7 @@ hollow_add_plugin(milkytracker
   SKIN "${CMAKE_CURRENT_SOURCE_DIR}/skin"
   SOURCES plugin.cpp tracker_host.cpp
   BUNDLE_ID studio.musica.milkytracker
-  VERSION 0.1.0
+  VERSION 1.0.0
   VENDOR musica.studio
   AU_MANUFACTURER Msst
   AU_SUBTYPE MkTr

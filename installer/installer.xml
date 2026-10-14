@@ -5,7 +5,7 @@
   what each element does. "from" is a path in this repo's bin/ folder.
 -->
 <installer>
-  <product name="MilkyTracker.vst" version="1.05.01" publisher="musica.studio" id="studio.musica.milkytrackervst"
+  <product name="MilkyTracker.vst" version="1.0.0" publisher="musica.studio" id="studio.musica.milkytrackervst"
            map="product/map.png" icon="product/icon.png"/>
 
   <updates url="https://musica.studio/updates/milkytracker/latest.json">

@@ -1,0 +1,172 @@
+name: build
+
+on:
+  push:
+    branches: [master]
+    tags: ['vst*']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # The plug-in (plugin/ on hollow/), every format the platform has, collected in bin/<format> by the build. The
+  # first configure downloads the CLAP and VST3 SDKs, clap-wrapper, RtAudio and RtMidi. Every check of
+  # plugin/CMakeLists.txt runs on each leg, as plugin/test.py runs them on the machines it reaches.
+  plugin:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: windows
+            configure: -A x64
+          - os: windows-latest
+            name: windows-x86
+            configure: -A Win32
+          - os: ubuntu-latest
+            name: linux
+            configure: -DCMAKE_BUILD_TYPE=Release
+          - os: macos-latest
+            name: macos
+            configure: -DCMAKE_BUILD_TYPE=Release
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      # The editor is an X11 window, checked under Xvfb; the standalone's audio and MIDI are RtAudio's ALSA, JACK and
+      # PulseAudio backends and RtMidi's ALSA one, each built only when its headers are there.
+      - name: Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libasound2-dev libjack-jackd2-dev libpulse-dev zlib1g-dev pkg-config xvfb
+      - name: Configure
+        run: cmake -B build/plugin -S . -DMILKYTRACKER_PLUGIN=ON ${{ matrix.configure }}
+      - name: Build
+        run: cmake --build build/plugin --config Release --parallel
+      # The checks drive the processor and its editor with the worker on its own thread, so a loaded runner can miss
+      # a result a check reads without polling. Three tries: a flake passes a rerun, a regression fails all three.
+      - name: Test
+        if: runner.os != 'Linux'
+        run: ctest --test-dir build/plugin -C Release --output-on-failure --timeout 600 --repeat until-pass:3
+      - name: Test
+        if: runner.os == 'Linux'
+        run: xvfb-run -a -s "-screen 0 2800x2000x24" ctest --test-dir build/plugin --output-on-failure --timeout 600 --repeat until-pass:3
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shots-${{ matrix.name }}
+          path: build/plugin/shots
+          if-no-files-found: ignore
+      # Zipped here because an Actions artifact drops the executable bit, and a macOS bundle whose Contents/MacOS file
+      # is not executable will not launch. -y keeps the bundles' symlinks.
+      - name: Zip
+        if: runner.os != 'Windows'
+        run: cd bin && zip -ry ../plugin-${{ matrix.name }}.zip $(ls -d CLAP VST3 VST2 AU Standalone 2>/dev/null)
+      - name: Zip
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $dirs = 'CLAP', 'VST3', 'VST2', 'VST2 32-bit and DXi', 'Standalone' | Where-Object { Test-Path "bin/$_" } | ForEach-Object { "bin/$_" }
+          Compress-Archive -Path $dirs -DestinationPath plugin-${{ matrix.name }}.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: plugin-${{ matrix.name }}
+          path: plugin-${{ matrix.name }}.zip
+          if-no-files-found: error
+
+  # The installers, from musicastudio/Installer with the plug-in artifacts as payloads, all three built on Linux
+  # (Windows and macOS cross-compile, Linux needs cgo and X11) by installer/build.sh. The version is the plug-in's,
+  # out of plugin/CMakeLists.txt, and a tag that disagrees with it fails here. The installer's font comes from the
+  # INSTALLER_FONT secret (the engine's payload/font.bin in base64); without it the installers draw in Go Mono.
+  installer:
+    needs: plugin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: musicastudio/Installer
+          path: engine
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: engine/go.mod
+          cache-dependency-path: engine/go.sum
+      - name: Linux dependencies
+        run: sudo apt-get update && sudo apt-get install -y libgl1-mesa-dev xorg-dev
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: plugin-*
+          path: plugin
+      # Windows x64 and x86 go into one folder, the layout of a local bin/.
+      - name: Payloads
+        run: for p in windows windows-x86 macos linux; do unzip -qo "plugin/plugin-$p/plugin-$p.zip" -d "bin-${p%-x86}"; done
+      - name: Build
+        env:
+          INSTALLER_FONT: ${{ secrets.INSTALLER_FONT }}
+        run: |
+          v=$(sed -n 's/^  VERSION \([0-9.]*\)$/\1/p' plugin/CMakeLists.txt)
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "vst$v" ]; then echo "tag $GITHUB_REF_NAME, but plugin/CMakeLists.txt says $v"; exit 1; fi
+          if [ -n "$INSTALLER_FONT" ]; then echo "$INSTALLER_FONT" | base64 -d > engine/payload/font.bin; fi
+          INSTALLER=$PWD/engine VERSION=$v BIN_WINDOWS=$PWD/bin-windows BIN_MACOS=$PWD/bin-macos BIN_LINUX=$PWD/bin-linux installer/build.sh
+          cd installer/dist && zip -qry MilkyTracker.vst-MacOS-Installer.zip MilkyTracker.vst-MacOS-Installer.app && rm -r MilkyTracker.vst-MacOS-Installer.app && ls -l
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installers
+          path: installer/dist/*
+          if-no-files-found: error
+
+  release:
+    needs: [plugin, installer]
+    if: startsWith(github.ref, 'refs/tags/vst')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # The release body is the annotated tag's message, read off the API (actions/checkout peels a tag to its
+      # commit), under a Download table of the three installers. A lightweight tag has no message and fails here.
+      - name: Release notes from the tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sha=$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${GITHUB_REF_NAME}" --jq .object.sha)
+          gh api "repos/${GITHUB_REPOSITORY}/git/tags/$sha" --jq .message > tag.md && test -s tag.md
+          url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}"
+          {
+            echo "## Download"
+            echo
+            echo "| | Installer | |"
+            echo "|---|---|---|"
+            echo "| **Windows** | [MilkyTracker.vst-Windows-Installer.exe]($url/MilkyTracker.vst-Windows-Installer.exe) | Run it; it asks for admin rights to install into Program Files |"
+            echo "| **macOS** | [MilkyTracker.vst-MacOS-Installer.zip]($url/MilkyTracker.vst-MacOS-Installer.zip) | Unzip and open MilkyTracker.vst-MacOS-Installer; it is not signed, so right-click it and choose Open the first time |"
+            echo "| **Linux** | [MilkyTracker.vst-Linux-Installer]($url/MilkyTracker.vst-Linux-Installer) | \`chmod +x MilkyTracker.vst-Linux-Installer\`, then run it |"
+            echo
+            echo "The installer puts every format in place (VST3, CLAP, VST2, the 32-bit VST2 with its DXi, AU and the standalone) and can keep MilkyTracker.vst up to date. To install one format by hand instead, take its own zip from the list below, \`MilkyTracker.vst-<OS>-<format>.zip\`. \`MilkyTracker.vst-MacOS-Update\` is for the updater, not for downloading."
+            echo
+            echo "---"
+            echo
+            cat tag.md
+          } > notes.md
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      # One zip per format, MilkyTracker.vst-<OS>-<format>.zip, each holding just that format's files. The 64-bit
+      # Windows VST2 is VST2-64 beside the 32-bit VST2-32-DXi. The installers go up as they are, with SHA256SUMS.txt.
+      - name: Release files
+        run: |
+          out=$PWD/release && mkdir -p "$out"
+          split() { # split <artifact> <OS>
+            rm -rf x && mkdir x && unzip -q "artifacts/plugin-$1/plugin-$1.zip" -d x
+            for d in x/*/; do
+              f=$(basename "$d")
+              case "$f/$2" in "VST2 32-bit and DXi/"*) f=VST2-32-DXi ;; VST2/Windows) f=VST2-64 ;; esac
+              (cd "$d" && zip -qry "$out/MilkyTracker.vst-$2-$f.zip" .)
+            done
+          }
+          split windows Windows && split windows-x86 Windows && split macos MacOS && split linux Linux
+          cp artifacts/installers/* "$out/"
+          cd "$out" && sha256sum * > SHA256SUMS.txt && ls -l
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          body_path: notes.md
