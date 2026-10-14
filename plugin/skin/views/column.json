@@ -1236,51 +1236,43 @@
    "tip": "MilkyTracker at twice its size, a quarter in sight: the bars beside it pan (its Config page's Scale x2)"
   },
   {
-   "type": "plate",
-   "name": "musica",
-   "rect": [
-    137,
-    690,
-    54,
-    22
-   ],
-   "text": {
-    "text": "musica.",
-    "font": "aw_light_16",
-    "align": "left",
-    "valign": "middle"
-   }
-  },
-  {
-   "type": "plate",
-   "name": "studio",
-   "rect": [
-    191,
-    690,
-    48,
-    22
-   ],
-   "text": {
-    "text": "studio",
-    "font": "aw_pale_16",
-    "align": "left",
-    "valign": "middle"
-   }
-  },
-  {
    "type": "button",
-   "name": "musica_studio",
+   "name": "audio_midi",
    "rect": [
-    137,
+    96,
     690,
-    100,
+    140,
     22
    ],
-   "layer": 4,
-   "press": "up",
+   "fill": {
+    "image": "buttons/dark_wide"
+   },
+   "text": {
+    "text": "Audio/MIDI Setup",
+    "font": "mt_text",
+    "align": "center",
+    "valign": "middle"
+   },
+   "pad": [
+    2,
+    0,
+    2,
+    3
+   ],
+   "hoverTiles": true,
+   "pressOffset": [
+    1,
+    1
+   ],
    "action": {
-    "url": "https://github.com/musicastudio/MilkyTracker.vst"
-   }
+    "standalone": "settings"
+   },
+   "press": "up",
+   "showIf": {
+    "var": "standalone",
+    "equals": "1"
+   },
+   "tip": "The standalone's audio and MIDI devices"
   }
  ]
 }
