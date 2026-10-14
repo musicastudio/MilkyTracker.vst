@@ -75,7 +75,7 @@ The Mode group at the top of the right column picks one.
 ## Not done yet
 
 - LHA- and ZIP-packed modules open on Windows only: the macOS and Linux builds have no unpackers for them.
-- The macOS standalone app has not been built here (the Mac VM has the command line tools, not Xcode). With no one logged in to the VM's desktop, `auval` has not run and the macOS editor checks ran offscreen.
+- The macOS standalone app builds in CI, where GitHub's runners have Xcode (the Mac VM has the command line tools alone), but no check starts it: `check_host` skips the standalone on macOS.
 - On Linux the file dialogs need zenity or kdialog; without either the tracker's Load and Save do nothing.
 - Only the current tab follows the host. MilkyTracker's other tabs play as they would on their own.
 - DAW Sync places the song by its starting speed; a song that changes speed partway lands a little off when the host jumps into it.
