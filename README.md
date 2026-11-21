@@ -85,3 +85,7 @@ That builds every format and runs every check on all three platforms: Windows wh
 ## MilkyTracker itself
 
 Without `MILKYTRACKER_PLUGIN` this repository builds MilkyTracker the app, as upstream does. [INSTALL.md](INSTALL.md) has its build instructions, [docs/readme_unix](docs/readme_unix) the notes for its SDL port, and [milkytracker.org](https://milkytracker.org) its downloads, manual and [community](https://milkytracker.org/community/).
+
+## AI use disclosure
+
+MilkyTracker.vst was built using [Claude Code](https://claude.com/claude-code) with Claude Opus 5.5 and Claude Sonnet 5.5.
