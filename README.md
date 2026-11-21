@@ -8,8 +8,6 @@
 
 Discord: https://discord.gg/VTMqnpvpj8
 
-Licensed GPL-3, as MilkyTracker is, see `COPYING` (MilkyPlay, its player library, is New-BSD).
-
 ## What it does
 
 **The tracker.** MilkyTracker's own screen at 1024 x 720 on the left of the window: the pattern editor, instruments, samples, the config pages, its keys and its mouse, unchanged. Click into it and it has the keyboard, typing notes by key place as Fasttracker II does, ahead of the host's shortcuts, on Windows, macOS and Linux alike. Its Config page's Scale, or the Tracker 1x and 2x buttons in the column, show it at twice the size in the same area, a quarter at a time, with neon bars on the well's dividers to pan it.
@@ -89,3 +87,7 @@ Without `MILKYTRACKER_PLUGIN` this repository builds MilkyTracker the app, as up
 ## AI use disclosure
 
 MilkyTracker.vst was built using [Claude Code](https://claude.com/claude-code) with Claude Opus 5.5 and Claude Sonnet 5.5.
+
+## License
+
+MilkyTracker.vst is free software under the GNU General Public License v3.0, as MilkyTracker is, in [COPYING](COPYING). MilkyPlay, its player library, is under the New BSD License.
